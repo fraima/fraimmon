@@ -2,10 +2,8 @@ package server
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"regexp"
-	"strconv"
 
 	"fraima.io/fraimmon/internal/storage"
 	"fraima.io/fraimmon/internal/types"
@@ -23,8 +21,8 @@ func New(storage storage.Storage) *Server {
 
 func UrlTreatment(uri string) (types.MetricItem, int) {
 
-	log.Printf("<UrlTreatment> start func")
-	log.Printf("<UrlTreatment> init payload: %s", uri)
+	// log.Printf("<UrlTreatment> start func")
+	// log.Printf("<UrlTreatment> init payload: %s", uri)
 
 	var m types.MetricItem
 	re := regexp.MustCompile(`\/update\/(counter|gauge)\/(\w*)/(\w*)`)
@@ -53,7 +51,7 @@ func UrlTreatment(uri string) (types.MetricItem, int) {
 }
 
 func (s *Server) Get(w http.ResponseWriter, r *http.Request) {
-	log.Printf("<Get:server> start func")
+	// log.Printf("<Get:server> start func")
 	var m types.MetricItem
 	m, code := UrlTreatment(r.URL.Path)
 
@@ -69,25 +67,25 @@ func (s *Server) Get(w http.ResponseWriter, r *http.Request) {
 
 	// status := problem.StorageErrToStatus(err)
 	w.WriteHeader(code)
-	log.Printf("<Get:server> exit func")
+	// log.Printf("<Get:server> exit func")
 }
 
 func (s *Server) Put(w http.ResponseWriter, r *http.Request) {
-	log.Printf("<Put:server> start func")
+	// log.Printf("<Put:server> start func")
 	var m types.MetricItem
 
 	m, _ = UrlTreatment(r.URL.Path)
 
-	log.Printf("<Put:server> payload <- <UrlTreatment>: %s", m)
+	// log.Printf("<Put:server> payload <- <UrlTreatment>: %s", m)
 	code := s.storage.Put(m)
 
 	if code == http.StatusOK {
 		w.WriteHeader(code)
 		return
 	} else {
-		log.Printf("<Put:server> status code: %s", strconv.FormatInt(int64(code), 10))
+		// log.Printf("<Put:server> status code: %s", strconv.FormatInt(int64(code), 10))
 	}
 
 	w.WriteHeader(code)
-	log.Printf("<Put:server> exit func")
+	// log.Printf("<Put:server> exit func")
 }

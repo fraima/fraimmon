@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"log"
+	// "log"
 	"net/http"
 	"strconv"
 	"sync"
@@ -25,7 +25,7 @@ func NewInMemory() *InMemory {
 
 func (s *InMemory) Get(m types.MetricItem) (interface{}, int) {
 
-	log.Printf("инициализация запроса GET inMemory")
+	// log.Printf("инициализация запроса GET inMemory")
 
 	s.lock.Lock()
 	defer s.lock.Unlock()
@@ -49,15 +49,15 @@ func (s *InMemory) Get(m types.MetricItem) (interface{}, int) {
 
 func (s *InMemory) Put(m types.MetricItem) int {
 
-	log.Printf("<Put:inMemory> start func")
-	log.Printf("<Put:InMemory> payload <- <Put:server>: %s", m)
+	// log.Printf("<Put:inMemory> start func")
+	// log.Printf("<Put:InMemory> payload <- <Put:server>: %s", m)
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
 	switch m.Type {
 	case "counter":
-		log.Printf("<Put:inMemory> %s", m.Type)
-		log.Printf("<Put:inMemory> goto case counter")
+		// log.Printf("<Put:inMemory> %s", m.Type)
+		// log.Printf("<Put:inMemory> goto case counter")
 		var i types.Counter
 
 		v, err := strconv.ParseInt(m.Value, 10, 64)
@@ -72,8 +72,8 @@ func (s *InMemory) Put(m types.MetricItem) int {
 		s.c[m.Name] = i
 
 	case "gauge":
-		log.Printf("<Put:inMemory> %s", m.Type)
-		log.Printf("<Put:inMemory> goto case gauge")
+		// log.Printf("<Put:inMemory> %s", m.Type)
+		// log.Printf("<Put:inMemory> goto case gauge")
 		var i types.Gauge
 
 		v, err := strconv.ParseFloat(m.Value, 64)
@@ -88,10 +88,10 @@ func (s *InMemory) Put(m types.MetricItem) int {
 		s.g[m.Name] = i
 
 	default:
-		log.Printf("<Put:inMemory> %s", m.Type)
-		log.Printf("<Put:inMemory> goto case DEFAULT")
+		// log.Printf("<Put:inMemory> %s", m.Type)
+		// log.Printf("<Put:inMemory> goto case DEFAULT")
 		return problem.StorageErrToStatus(problem.ErrNotFound)
 	}
-	log.Printf("<Put:inMemory> exit func")
+	// log.Printf("<Put:inMemory> exit func")
 	return http.StatusOK
 }
