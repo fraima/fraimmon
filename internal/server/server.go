@@ -2,45 +2,17 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"regexp"
+	"strconv"
 
 	"fraima.io/fraimmon/internal/storage"
+	"fraima.io/fraimmon/internal/types"
 )
 
 type Server struct {
 	storage storage.Storage
-}
-
-func UrlTreatmentPush(urli string) (string, string, string) {
-
-	var metricType string
-	var metricName string
-	var metricValue string
-
-	re := regexp.MustCompile(`\/update\/(counter|gauge)\/(\w*)\/([0-9]*.[0-9]*)`)
-	sliceReg := re.FindStringSubmatch(urli)
-
-	metricType = sliceReg[1]
-	metricName = sliceReg[2]
-	metricValue = sliceReg[3]
-
-	return metricType, metricName, metricValue
-
-}
-
-func UrlTreatmentGet(urli string) (string, string) {
-	var metricType string
-	var metricName string
-
-	re := regexp.MustCompile(`\/update\/(counter|gauge)\/(\w*)`)
-	sliceReg := re.FindStringSubmatch(urli)
-
-	metricType = sliceReg[1]
-	metricName = sliceReg[2]
-
-	return metricName, metricType
-
 }
 
 func New(storage storage.Storage) *Server {
@@ -49,43 +21,73 @@ func New(storage storage.Storage) *Server {
 	}
 }
 
+func UrlTreatment(uri string) (types.MetricItem, int) {
+
+	log.Printf("<UrlTreatment> start func")
+	log.Printf("<UrlTreatment> init payload: %s", uri)
+
+	var m types.MetricItem
+	re := regexp.MustCompile(`\/update\/(counter|gauge)\/(\w*)/(\w*)`)
+	sliceReg := re.FindStringSubmatch(uri)
+
+	if len(sliceReg) == 4 {
+		m.Type = sliceReg[1]
+		m.Name = sliceReg[2]
+		m.Value = sliceReg[3]
+
+	} else {
+		return m, http.StatusNotFound
+	}
+
+	if len(sliceReg) == 3 {
+		m.Type = sliceReg[1]
+		m.Name = sliceReg[2]
+		m.Value = ""
+
+	} else {
+		return m, http.StatusNotFound
+	}
+
+	return m, http.StatusOK
+
+}
+
 func (s *Server) Get(w http.ResponseWriter, r *http.Request) {
+	log.Printf("<Get:server> start func")
+	var m types.MetricItem
+	m, code := UrlTreatment(r.URL.Path)
 
-	metricName, metricsType := UrlTreatmentGet(r.URL.Path)
+	if code != http.StatusOK {
+		w.WriteHeader(code)
+	}
 
-	val, err := s.storage.Get(metricName, metricsType)
-	if err == nil {
+	val, code := s.storage.Get(m)
+	if code == http.StatusOK {
 		fmt.Fprint(w, val)
 		return
 	}
 
-	status := storageErrToStatus(err)
-	w.WriteHeader(status)
+	// status := problem.StorageErrToStatus(err)
+	w.WriteHeader(code)
+	log.Printf("<Get:server> exit func")
 }
 
 func (s *Server) Put(w http.ResponseWriter, r *http.Request) {
-	var metricType, metricName, metricValue string
+	log.Printf("<Put:server> start func")
+	var m types.MetricItem
 
-	metricType, metricName, metricValue = UrlTreatmentPush(r.URL.Path)
+	m, _ = UrlTreatment(r.URL.Path)
 
-	err := s.storage.Put(metricName, metricValue, metricType)
+	log.Printf("<Put:server> payload <- <UrlTreatment>: %s", m)
+	code := s.storage.Put(m)
 
-	if err == nil {
-		w.WriteHeader(http.StatusOK)
+	if code == http.StatusOK {
+		w.WriteHeader(code)
 		return
+	} else {
+		log.Printf("<Put:server> status code: %s", strconv.FormatInt(int64(code), 10))
 	}
 
-	status := storageErrToStatus(err)
-	w.WriteHeader(status)
-}
-
-func storageErrToStatus(err error) int {
-	switch err {
-	case storage.ErrAlreadyExists:
-		return http.StatusConflict
-	case storage.ErrNotFound:
-		return http.StatusNotFound
-	default:
-		return http.StatusInternalServerError
-	}
+	w.WriteHeader(code)
+	log.Printf("<Put:server> exit func")
 }

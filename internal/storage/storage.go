@@ -1,15 +1,10 @@
 package storage
 
 import (
-	"errors"
-)
-
-var (
-	ErrNotFound      = errors.New("not found")
-	ErrAlreadyExists = errors.New("already exists")
+	"fraima.io/fraimmon/internal/types"
 )
 
 type Storage interface {
-	Get(key string, metricType string) (interface{}, error)
-	Put(key, value string, metricType string) error
+	Get(m types.MetricItem) (interface{}, int)
+	Put(m types.MetricItem) int
 }
