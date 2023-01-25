@@ -63,7 +63,7 @@ func (s *InMemory) Put(m types.MetricItem) int {
 		v, err := strconv.ParseInt(m.Value, 10, 64)
 
 		if err != nil {
-			return http.StatusOK
+			return http.StatusBadRequest
 		}
 
 		i.Name = m.Name
@@ -79,7 +79,7 @@ func (s *InMemory) Put(m types.MetricItem) int {
 		v, err := strconv.ParseFloat(m.Value, 64)
 
 		if err != nil {
-			return http.StatusOK
+			return http.StatusBadRequest
 		}
 
 		i.Name = m.Name

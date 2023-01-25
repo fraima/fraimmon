@@ -25,7 +25,7 @@ func UrlTreatment(uri string) (types.MetricItem, int) {
 	// log.Printf("<UrlTreatment> init payload: %s", uri)
 
 	var m types.MetricItem
-	re := regexp.MustCompile(`\/update\/(counter|gauge)\/(\w*)/(\w*)`)
+	re := regexp.MustCompile(`\/update\/(counter|gauge)\/(\w*)\/(\w.*)`)
 	sliceReg := re.FindStringSubmatch(uri)
 
 	if len(sliceReg) == 4 {
@@ -33,11 +33,7 @@ func UrlTreatment(uri string) (types.MetricItem, int) {
 		m.Name = sliceReg[2]
 		m.Value = sliceReg[3]
 
-	} else {
-		return m, http.StatusNotFound
-	}
-
-	if len(sliceReg) == 3 {
+	} else if len(sliceReg) == 3 {
 		m.Type = sliceReg[1]
 		m.Name = sliceReg[2]
 		m.Value = ""
@@ -82,9 +78,9 @@ func (s *Server) Put(w http.ResponseWriter, r *http.Request) {
 	if code == http.StatusOK {
 		w.WriteHeader(code)
 		return
-	} else {
-		// log.Printf("<Put:server> status code: %s", strconv.FormatInt(int64(code), 10))
-	}
+	} //else {
+	// log.Printf("<Put:server> status code: %s", strconv.FormatInt(int64(code), 10))
+	//}
 
 	w.WriteHeader(code)
 	// log.Printf("<Put:server> exit func")
