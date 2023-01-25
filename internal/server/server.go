@@ -39,7 +39,7 @@ func UrlTreatment(uri string) (types.MetricItem, int) {
 		m.Value = ""
 
 	} else {
-		return m, http.StatusNotFound
+		return m, http.StatusNotImplemented
 	}
 
 	return m, http.StatusOK

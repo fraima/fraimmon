@@ -17,10 +17,10 @@ func main() {
 
 	s := server.New(st)
 
-	m.Get("/update/counter/*", s.Get)
+	m.Get("/value/counter/*", s.Get)
 	m.Post("/update/counter/*", s.Put)
 
-	m.Get("/update/gauge/*", s.Get)
+	m.Get("/value/gauge/*", s.Get)
 	m.Post("/update/gauge/*", s.Put)
 
 	http.ListenAndServe(":8080", m)
