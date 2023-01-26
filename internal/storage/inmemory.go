@@ -2,11 +2,10 @@ package storage
 
 import (
 	// "log"
+
 	"net/http"
-	"strconv"
 	"sync"
 
-	"fraima.io/fraimmon/internal/problem"
 	"fraima.io/fraimmon/internal/types"
 )
 
@@ -23,75 +22,47 @@ func NewInMemory() *InMemory {
 	}
 }
 
-func (s *InMemory) Get(m types.MetricItem) (interface{}, int) {
-
-	// log.Printf("инициализация запроса GET inMemory")
+func (s *InMemory) Get(m interface{}) (interface{}, int) {
 
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	switch m.Type {
-	case "counter":
-		if v, ok := s.c[m.Name]; ok {
+	switch i := m.(type) {
+
+	case types.Counter:
+		if v, ok := s.c[i.Name]; ok {
 			return v.Value, http.StatusOK
 		}
-	case "gauge":
-		if v, ok := s.g[m.Name]; ok {
+
+	case types.Gauge:
+		if v, ok := s.g[i.Name]; ok {
 			return v.Value, http.StatusOK
 		}
+
 	default:
-		return nil, problem.StorageErrToStatus(problem.ErrNotFound)
+		return nil, http.StatusNotFound
 
 	}
 
-	return nil, http.StatusOK
+	return nil, http.StatusNotFound
 }
 
-func (s *InMemory) Put(m types.MetricItem) int {
+func (s *InMemory) Put(m interface{}) int {
 
-	// log.Printf("<Put:inMemory> start func")
-	// log.Printf("<Put:InMemory> payload <- <Put:server>: %s", m)
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	switch m.Type {
-	case "counter":
-		// log.Printf("<Put:inMemory> %s", m.Type)
-		// log.Printf("<Put:inMemory> goto case counter")
-		var i types.Counter
+	switch i := m.(type) {
 
-		v, err := strconv.ParseInt(m.Value, 10, 64)
+	case types.Counter:
+		s.c[i.Name] = i
 
-		if err != nil {
-			return http.StatusBadRequest
-		}
-
-		i.Name = m.Name
-		i.Value = v
-
-		s.c[m.Name] = i
-
-	case "gauge":
-		// log.Printf("<Put:inMemory> %s", m.Type)
-		// log.Printf("<Put:inMemory> goto case gauge")
-		var i types.Gauge
-
-		v, err := strconv.ParseFloat(m.Value, 64)
-
-		if err != nil {
-			return http.StatusBadRequest
-		}
-
-		i.Name = m.Name
-		i.Value = v
-
-		s.g[m.Name] = i
+	case types.Gauge:
+		s.g[i.Name] = i
 
 	default:
-		// log.Printf("<Put:inMemory> %s", m.Type)
-		// log.Printf("<Put:inMemory> goto case DEFAULT")
-		return problem.StorageErrToStatus(problem.ErrNotFound)
+		return http.StatusNotFound
 	}
-	// log.Printf("<Put:inMemory> exit func")
+
 	return http.StatusOK
 }
