@@ -55,14 +55,21 @@ func (s *InMemory) Put(m interface{}) int {
 	switch i := m.(type) {
 
 	case types.Counter:
+		var currentValue, newValue int64
+
+		currentValue = s.c[i.Name].Value
+		newValue = currentValue + i.Value
+		i.Value = newValue
+
 		s.c[i.Name] = i
+		return http.StatusOK
 
 	case types.Gauge:
 		s.g[i.Name] = i
+		return http.StatusOK
 
 	default:
 		return http.StatusNotFound
 	}
 
-	return http.StatusOK
 }

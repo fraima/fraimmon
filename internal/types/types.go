@@ -14,9 +14,3 @@ type Metrics struct {
 	Gauges   []Gauge   `json:"gauges"`
 	Counters []Counter `json:"counters"`
 }
-
-type MetricItem struct {
-	Name  string
-	Value string
-	Type  string
-}

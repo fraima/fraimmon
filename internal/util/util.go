@@ -42,6 +42,19 @@ func UrlTreatment(uri string) (interface{}, int) {
 		re := regexp.MustCompile(`\/update\/(counter|gauge)\/(\w*)\/(\w.*)`)
 		sliceReg := re.FindStringSubmatch(uri)
 
+		// Этот кусок тут чисто что бы прошел тест ибо конфликтует с условием ниже
+		// /update/unknown/testCounter/100  -хочет 501
+		// /update/counter/testCounter/none -хочет 400
+		// хотя оба на мой взгляд бед реквест. В любом случае хотел бы глянуть
+		// как планировалось.
+		testDone := strings.Split(uri, "/")[2]
+		switch testDone {
+		case "counter":
+		case "gauge":
+		default:
+			return i, http.StatusNotImplemented
+		}
+
 		if len(sliceReg) < 4 {
 			return i, http.StatusNotFound
 		}
