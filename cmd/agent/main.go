@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"fraima.io/fraimmon/internal/agent"
-	"fraima.io/fraimmon/internal/types"
+	"fraima.io/fraimmon/internal/dtype"
 )
 
 func main() {
@@ -12,13 +12,13 @@ func main() {
 	var pollInterval int
 	var pushInterval int
 
-	m := types.Metrics{
-		Gauges:   make([]types.Gauge, 28),
-		Counters: make([]types.Counter, 1),
+	m := dtype.Metrics{
+		Gauges:   make([]dtype.Gauge, 28),
+		Counters: make([]dtype.Counter, 1),
 	}
 
 	pollInterval = 1
-	pushInterval = 2
+	pushInterval = 10
 
 	mainUrl := "http://localhost:8080"
 

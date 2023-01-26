@@ -1,4 +1,4 @@
-package types
+package dtype
 
 type Gauge struct {
 	Name  string  `json:"name"`

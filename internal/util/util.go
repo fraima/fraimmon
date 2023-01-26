@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"strings"
 
-	"fraima.io/fraimmon/internal/types"
+	"fraima.io/fraimmon/internal/dtype"
 )
 
-func UrlTreatment(uri string) (interface{}, int) {
+func URLTreatment(uri string) (interface{}, int) {
 
 	var i interface{}
 
@@ -25,12 +25,12 @@ func UrlTreatment(uri string) (interface{}, int) {
 		switch sliceReg[1] {
 
 		case "counter":
-			var c types.Counter
+			var c dtype.Counter
 			c.Name = sliceReg[2]
 			return c, http.StatusOK
 
 		case "gauge":
-			var g types.Gauge
+			var g dtype.Gauge
 			g.Name = sliceReg[2]
 			return g, http.StatusOK
 
@@ -62,7 +62,7 @@ func UrlTreatment(uri string) (interface{}, int) {
 		switch sliceReg[1] {
 
 		case "counter":
-			var c types.Counter
+			var c dtype.Counter
 
 			v, err := strconv.ParseInt(sliceReg[3], 10, 64)
 
@@ -75,7 +75,7 @@ func UrlTreatment(uri string) (interface{}, int) {
 			return c, http.StatusOK
 
 		case "gauge":
-			var g types.Gauge
+			var g dtype.Gauge
 
 			v, err := strconv.ParseFloat(sliceReg[3], 64)
 			if err != nil {

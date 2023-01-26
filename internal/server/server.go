@@ -19,7 +19,7 @@ func New(storage storage.Storage) *Server {
 }
 
 func (s *Server) Get(w http.ResponseWriter, r *http.Request) {
-	m, code := util.UrlTreatment(r.URL.Path)
+	m, code := util.URLTreatment(r.URL.Path)
 	if code != http.StatusOK {
 		w.WriteHeader(code)
 	}
@@ -35,7 +35,7 @@ func (s *Server) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) Put(w http.ResponseWriter, r *http.Request) {
-	m, code := util.UrlTreatment(r.URL.Path)
+	m, code := util.URLTreatment(r.URL.Path)
 	if code != http.StatusOK {
 		w.WriteHeader(code)
 	}

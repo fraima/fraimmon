@@ -6,19 +6,19 @@ import (
 	"net/http"
 	"sync"
 
-	"fraima.io/fraimmon/internal/types"
+	"fraima.io/fraimmon/internal/dtype"
 )
 
 type InMemory struct {
 	lock sync.Mutex
-	g    map[string]types.Gauge
-	c    map[string]types.Counter
+	g    map[string]dtype.Gauge
+	c    map[string]dtype.Counter
 }
 
 func NewInMemory() *InMemory {
 	return &InMemory{
-		g: make(map[string]types.Gauge),
-		c: make(map[string]types.Counter),
+		g: make(map[string]dtype.Gauge),
+		c: make(map[string]dtype.Counter),
 	}
 }
 
@@ -29,12 +29,12 @@ func (s *InMemory) Get(m interface{}) (interface{}, int) {
 
 	switch i := m.(type) {
 
-	case types.Counter:
+	case dtype.Counter:
 		if v, ok := s.c[i.Name]; ok {
 			return v.Value, http.StatusOK
 		}
 
-	case types.Gauge:
+	case dtype.Gauge:
 		if v, ok := s.g[i.Name]; ok {
 			return v.Value, http.StatusOK
 		}
@@ -54,7 +54,7 @@ func (s *InMemory) Put(m interface{}) int {
 
 	switch i := m.(type) {
 
-	case types.Counter:
+	case dtype.Counter:
 		var currentValue, newValue int64
 
 		currentValue = s.c[i.Name].Value
@@ -64,7 +64,7 @@ func (s *InMemory) Put(m interface{}) int {
 		s.c[i.Name] = i
 		return http.StatusOK
 
-	case types.Gauge:
+	case dtype.Gauge:
 		s.g[i.Name] = i
 		return http.StatusOK
 
