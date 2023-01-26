@@ -42,6 +42,10 @@ func UrlTreatment(uri string) (interface{}, int) {
 		re := regexp.MustCompile(`\/update\/(counter|gauge)\/(\w*)\/(\w.*)`)
 		sliceReg := re.FindStringSubmatch(uri)
 
+		if len(sliceReg) < 4 {
+			return i, http.StatusNotFound
+		}
+
 		switch sliceReg[1] {
 
 		case "counter":
@@ -50,7 +54,7 @@ func UrlTreatment(uri string) (interface{}, int) {
 			v, err := strconv.ParseInt(sliceReg[3], 10, 64)
 
 			if err != nil {
-				return i, http.StatusNotImplemented
+				return c, http.StatusBadRequest
 			}
 
 			c.Name = sliceReg[2]
@@ -62,7 +66,7 @@ func UrlTreatment(uri string) (interface{}, int) {
 
 			v, err := strconv.ParseFloat(sliceReg[3], 64)
 			if err != nil {
-				return i, http.StatusNotImplemented
+				return g, http.StatusBadRequest
 			}
 
 			g.Name = sliceReg[2]
